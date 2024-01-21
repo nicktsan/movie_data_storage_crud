@@ -1,0 +1,15 @@
+{
+    "jsc": {
+        "parser": {
+            "syntax": "typescript"
+        },
+        "target": "es2016"
+    },
+    "exclude": [
+        ".*.test.ts$"
+    ],
+    "module": {
+        "type": "commonjs"
+    },
+    "sourceMaps": true
+}
