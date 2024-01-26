@@ -3,17 +3,35 @@ variable "environment" {
   type        = string
 }
 
-variable "mux_secret_key" {
-  description = "Key of the mux secret stored in hcp vault secrets"
+variable "mux_access_token_id" {
+  description = "access token id for mux stored in hcp vault secrets"
+  type        = string
+  sensitive   = true
+}
+
+variable "mux_access_token_secret" {
+  description = "secret of the access token from mux stored in hcp vault secrets"
   type        = string
   sensitive   = true
 }
 
 variable "mux_webhook_signing_secret" {
-  description = "Key of the mux webhook signing secret stored in hcp vault secrets"
+  description = "signing secret of the mux webhook stored in hcp vault secrets"
   type        = string
   sensitive   = true
 }
+
+# variable "mux_secret_key" {
+#   description = "Key of the mux secret stored in hcp vault secrets"
+#   type        = string
+#   sensitive   = true
+# }
+
+# variable "mux_webhook_signing_secret" {
+#   description = "Key of the mux webhook signing secret stored in hcp vault secrets"
+#   type        = string
+#   sensitive   = true
+# }
 
 variable "region" {
   description = "Region of the app"
@@ -35,10 +53,10 @@ variable "lambda_runtime" {
   type        = string
 }
 
-variable "detail_type" {
-  description = "detail-type of eventbridge event"
-  type        = string
-}
+# variable "detail_type" {
+#   description = "detail-type of eventbridge event"
+#   type        = string
+# }
 
 variable "mux_lambda_event_source" {
   description = "source of the eventbridge event"
@@ -75,8 +93,18 @@ variable "event_bus_name" {
   type        = string
 }
 
-variable "mux_checkout_session_completed_event_type" {
-  description = "Event type of the mux webhook event being sent to the PUT movie_data_crud lambda"
+variable "mux_video_asset_ready" {
+  description = "Event type of the mux webhook event video.asset.ready being sent to the PUT movie_data_crud lambda"
+  type        = string
+}
+
+variable "mux_video_asset_created" {
+  description = "Event type of mux webhook event video.asset.created being sent to PUT movie_data_crud lambda"
+  type        = string
+}
+
+variable "mux_video_upload_cancelled" {
+  description = "Event type of mux webhook event video.upload.cancelled being sent to PUT movie_data_crud lambda"
   type        = string
 }
 
@@ -147,5 +175,30 @@ variable "get_specific_apigateway_route_key" {
 
 variable "get_specific_api_gateway_execution_arn_suffix" {
   description = "Suffix for the get specific api gateway execution arn"
+  type        = string
+}
+
+variable "movie_data_crud_s3_bucket" {
+  description = "S3 bucket for movie data crud app"
+  type        = string
+}
+
+variable "movie_data_crud_s3_bucket_name_tag" {
+  description = "Name tag of the S3 bucket for movie data crud app"
+  type        = string
+}
+
+variable "movie_data_crud_s3_bucket_env_tag" {
+  description = "Environment tag of the S3 bucket for movie data crud app"
+  type        = string
+}
+
+variable "dynamodb_hash_key" {
+  description = "Hash key of the dynamo db table"
+  type        = string
+}
+
+variable "dynamodb_range_key" {
+  description = "Range key of the dynamo db table"
   type        = string
 }

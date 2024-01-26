@@ -1,6 +1,6 @@
 import { EventBridgeEvent, EventBridgeHandler } from "aws-lambda";
-import Mux from "mux";
-import { getMux, getClient, getDocClient, verifyEventAsync, fulfillOrder } from "/opt/nodejs/utils";
+import Mux from '@mux/mux-node';
+import { getMux, getClient, getDocClient, verifyEventAsync, putMovieData } from "/opt/nodejs/utils";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 
@@ -19,29 +19,33 @@ const handler: EventBridgeHandler<any, any, any> = async (event: EventBridgeEven
     const eventVerification = await verifyEventAsync(event, mux);
     if (!mux) {
         console.info("mux is null. Nothing processed.")
-    } else if (!eventVerification.isVerified) {
+    } else if (!eventVerification) {
         console.log("Failed eventbridge event verified")
     } else {
         console.log("Successful eventbridge event verified")
-        // Handle the checkout.session.completed event
+        // Handle the event
 
         // Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
-        const myConstructedEventObject: any = eventVerification.constructedEvent?.data.object
-        const myConstructedEventObjectId = myConstructedEventObject.id
+        const eventdata = JSON.parse(event.detail.data)
+        // const myConstructedEventObject: any = eventVerification.constructedEvent?.data.object
+        // const myConstructedEventObjectId = myConstructedEventObject.id
 
-        console.log("myConstructedEventObjectId", myConstructedEventObjectId)
-        const sessionWithLineItems = await mux?.checkout.sessions.retrieve(
-            myConstructedEventObjectId,
-            {
-                expand
-                    : ['line_items'],
-            }
-        );
-        const lineItems = sessionWithLineItems.line_items;
+        // console.log("myConstructedEventObjectId", myConstructedEventObjectId)
+        // const sessionWithLineItems = await mux?.checkout.sessions.retrieve(
+        //     myConstructedEventObjectId,
+        //     {
+        //         expand
+        //             : ['line_items'],
+        //     }
+        // );
+        // const lineItems = sessionWithLineItems.line_items;
         // console.log("lineItems?.data[0].price", lineItems?.data[0].price)
         // lineItems?.data.forEach(lineItemdata => {
         // Fulfill the purchase...
-        const dataDetails = await fulfillOrder(lineItems!.data[0]/*, mux*/, event, docClient);
+        console.log("eventdata.type: ", eventdata.type)
+        if (eventdata.type === "video.asset.ready") {
+            await putMovieData(/*lineItems!.data[0], mux*/eventdata, docClient);
+        }
 
         // });
 

@@ -1,4 +1,4 @@
 {
-  "detail-type": ["${eventType}"],
+  "detail-type": [${eventType}],
   "source": ["${eventSource}"]
 }

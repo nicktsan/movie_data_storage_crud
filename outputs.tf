@@ -3,7 +3,7 @@ output "PutFunction" {
   description = "PutFunction function arn"
 }
 
-output "api_endpoint" {
-  value       = aws_apigatewayv2_api.http_lambda.api_endpoint
-  description = "Test API endpoint with this address"
-}
+# output "api_endpoint" {
+#   value       = aws_apigatewayv2_api.http_lambda.api_endpoint
+#   description = "Test API endpoint with this address"
+# }

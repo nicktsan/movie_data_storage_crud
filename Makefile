@@ -23,4 +23,4 @@ sync:
 destroy:
 	terraform destroy -var-file input.tfvars
 
-all: build package init sync validate plan apply
+all: init sync validate plan apply
