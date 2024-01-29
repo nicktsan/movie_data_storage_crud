@@ -56,84 +56,39 @@ async function verifyEventAsync(event: EventBridgeEvent<any, any>, mux: Mux | nu
 }
 
 //To insert a record into the data table, we need the following information:
-//id
-//title of the
+//playback_id
+//title of the movie from passthrough
 async function putMovieData(/*lineItemdata: Mux.LineItem,*/ eventdata: any, docClient: DynamoDBDocumentClient | null): Promise<Record<string, any> | null> {
     const dataDetails: Record<string, any> = {
-        playbackid: eventdata.data.playback_ids[0].id,
-        title: eventdata.data.passthrough.toLowerCase().trim()
-        // asset: eventdata.data
+        title: eventdata.data.passthrough.toLowerCase().trim(),
+        playbackid: eventdata.data.playback_ids[0].id
     }
-
     const command = new PutCommand({
         TableName: process.env.DYNAMODB_NAME,
         Item: dataDetails,
-        // ConditionExpression: 'attribute_not_exists(customer) AND attribute_not_exists(title)'
     });
     try {
         const response = await docClient?.send(command);
         console.log(response);
     } catch (err) {
-        // if (err instanceof ConditionalCheckFailedException) {
-        //     console.warn(`Entry containing customer and title already found. PUT operation stopped.`)
-        //     console.warn(err.message)
-        //     return null
-        // } else {
-        //     throw err
-        // }
         throw err
     }
     return dataDetails
 }
-
-//Get all items owned by the customer. Customer information provided in the event header.
-// async function queryAllItems(docClient: DynamoDBDocumentClient | null, event: APIGatewayProxyEventV2): Promise<QueryCommandOutput | undefined> {
-//     if (event.headers) {
-//         const header = event.headers
-//         const command = new QueryCommand({
-//             TableName: process.env.DYNAMODB_NAME,
-//             // Get all items where puchaseType = "Buy" or 
-//             // (purchaseType contains "rental" and  rentalExpiryDateEpochSeconds < current time in unix seconds)
-//             FilterExpression:
-//                 "purchaseType = :Buy or (contains(purchaseType, :Rental) and rentalExpiryDateEpochSeconds > :CurrentUnixTimeSeconds)",
-//             KeyConditionExpression:
-//                 "customer = :Customer",
-//             ExpressionAttributeValues: {
-//                 ":Customer": header.customer,
-//                 ":Buy": "Buy",
-//                 ":Rental": "rental",
-//                 ":CurrentUnixTimeSeconds": Math.floor(Date.now() / 1000)
-//             },
-//             ConsistentRead: true,
-//         });
-
-//         const response = await docClient?.send(command);
-//         // console.log("response?.Items: ", response?.Items);
-//         return response;
-//     }
-//     return undefined;
-// }
 
 //Search for specific items owned by the customer. Customer information provided in the event header.
 async function queryItemsByTitle(docClient: DynamoDBDocumentClient | null, event: APIGatewayProxyEventV2): Promise<QueryCommandOutput | undefined> {
     console.info('received request get by title:', event);
     const regex2 = (/(%20|\+)/g);
     if (event.headers) {
-        const header = event.headers
         const command = new QueryCommand({
             TableName: process.env.DYNAMODB_NAME,
             // Get all items where puchaseType = "Buy" or 
             // (purchaseType contains "rental" and  rentalExpiryDateEpochSeconds < current time in unix seconds)
-            //and lowercaseTitle contains title parameter
-            FilterExpression:
-                "contains(lowercaseTitle, :Title) and (purchaseType = :Buy or (contains(purchaseType, :Rental) and rentalExpiryDateEpochSeconds > :CurrentUnixTimeSeconds))",
+            //and title contains title parameter
             KeyConditionExpression:
-                "customer = :Customer",
+                "title = :Title",
             ExpressionAttributeValues: {
-                ":Customer": header.customer,
-                ":Buy": "Buy",
-                ":Rental": "rental",
-                ":CurrentUnixTimeSeconds": Math.floor(Date.now() / 1000),
                 ':Title': event.pathParameters?.title?.replace(regex2, ' ').toLowerCase()
             },
             ConsistentRead: true,
@@ -146,29 +101,4 @@ async function queryItemsByTitle(docClient: DynamoDBDocumentClient | null, event
     return undefined;
 }
 
-//Function to get product information from mux
-// async function getMuxProduct(resItems: Record<string, any>[] | undefined, mux: Mux | null): Promise<Mux.Product[] | undefined> {
-//     let queryCondition: string = ""
-//     for (let i = 0; i < resItems!.length; i++) {
-//         if (i != 0) {
-//             queryCondition = queryCondition + ' OR '
-//         }
-//         queryCondition = queryCondition + `name:'` + resItems![i].title.trim() + `'`
-//     }
-//     console.log("queryCondtion: ", queryCondition)
-//     const productsearch = await mux?.products.search({
-//         query: queryCondition
-//     })
-//     // console.log("productsearch?.data: ", productsearch?.data)
-//     return productsearch?.data
-// }
-//function to attach image data to response body
-// async function attachImageToResponse(resItems: Record<string, any>[] | undefined, products: Mux.Product[] | undefined): Promise<Record<string, any>[] | undefined> {
-//     resItems?.forEach(item => {
-//         const matchingProduct = products?.find((product) => product.name === item.title)
-//         item.image = matchingProduct?.images[0]
-//     });
-//     return resItems
-// }
-
-export { getMux, getClient, getDocClient, verifyEventAsync, putMovieData, /*queryAllItems,*/ queryItemsByTitle /*getMuxProduct, attachImageToResponse */ }
+export { getMux, getClient, getDocClient, verifyEventAsync, putMovieData, queryItemsByTitle }
