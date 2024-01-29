@@ -60,7 +60,7 @@ async function verifyEventAsync(event: EventBridgeEvent<any, any>, mux: Mux | nu
 //title of the
 async function putMovieData(/*lineItemdata: Mux.LineItem,*/ eventdata: any, docClient: DynamoDBDocumentClient | null): Promise<Record<string, any> | null> {
     const dataDetails: Record<string, any> = {
-        id: eventdata.data.id,
+        playbackid: eventdata.data.playback_ids[0].id,
         title: eventdata.data.passthrough.toLowerCase().trim()
         // asset: eventdata.data
     }
