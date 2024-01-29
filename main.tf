@@ -99,12 +99,12 @@ resource "aws_dynamodb_table" "movie_data_table" {
   # range_key      = var.dynamodb_range_key #sort key
 
   attribute {
-    name = var.dynamodb_hash_key //"id"
+    name = var.dynamodb_hash_key
     type = "S"
   }
 
   # attribute {
-  #   name = var.dynamodb_range_key //"title"
+  #   name = var.dynamodb_range_key
   #   type = "S"
   # }
 
@@ -186,75 +186,75 @@ module "put_movie_data_lambda" {
 ########################SELECT SPECIFIC MOVIE DATA##########################
 # Module for lambda to receive messages from api gateway and select specific movies owned by user
 #Test with https://keoncigqy7.execute-api.us-east-1.amazonaws.com/moviedata/{title}
-# module "select_specific_movie_data" {
-#   source         = "./modules/apigateway_to_lambda_to_dynamodb"
-#   sourceDir      = "${path.module}/lambda/dist/handlers/select_specific_movie_data/"
-#   outputPath     = "${path.module}/lambda/dist/select_specific_movie_data.zip"
-#   lambda_name    = var.select_specific_movie_data_name
-#   lambda_role    = aws_iam_role.lambda_to_dynamodb_role.arn
-#   lambda_handler = var.lambda_handler
-#   lambda_runtime = var.lambda_runtime
-#   lambda_layers = [
-#     aws_lambda_layer_version.lambda_deps_layer.arn,
-#     aws_lambda_layer_version.lambda_utils_layer.arn
-#   ]
-#   environment_variables = {
-#     MUX_TOKEN_ID               = data.hcp_vault_secrets_secret.mux_access_token_id.secret_value
-#     MUX_TOKEN_SECRET           = data.hcp_vault_secrets_secret.mux_access_token_secret.secret_value
-#     MUX_WEBHOOK_SIGNING_SECRET = data.hcp_vault_secrets_secret.mux_webhook_signing_secret.secret_value
-#     DYNAMODB_NAME              = var.dynamodb_table
-#     ROUTE_KEY                  = var.get_specific_apigateway_route_key
-#   }
-#   api_gateway_execution_arn        = aws_apigatewayv2_api.http_lambda.execution_arn
-#   apigateway_id                    = aws_apigatewayv2_api.http_lambda.id
-#   apigateway_route_key             = var.get_specific_apigateway_route_key
-#   api_gateway_execution_arn_suffix = var.get_specific_api_gateway_execution_arn_suffix
-# }
+module "select_specific_movie_data" {
+  source         = "./modules/apigateway_to_lambda_to_dynamodb"
+  sourceDir      = "${path.module}/lambda/dist/handlers/select_specific_movie_data/"
+  outputPath     = "${path.module}/lambda/dist/select_specific_movie_data.zip"
+  lambda_name    = var.select_specific_movie_data_name
+  lambda_role    = aws_iam_role.lambda_to_dynamodb_role.arn
+  lambda_handler = var.lambda_handler
+  lambda_runtime = var.lambda_runtime
+  lambda_layers = [
+    aws_lambda_layer_version.lambda_deps_layer.arn,
+    aws_lambda_layer_version.lambda_utils_layer.arn
+  ]
+  environment_variables = {
+    MUX_TOKEN_ID               = data.hcp_vault_secrets_secret.mux_access_token_id.secret_value
+    MUX_TOKEN_SECRET           = data.hcp_vault_secrets_secret.mux_access_token_secret.secret_value
+    MUX_WEBHOOK_SIGNING_SECRET = data.hcp_vault_secrets_secret.mux_webhook_signing_secret.secret_value
+    DYNAMODB_NAME              = var.dynamodb_table
+    ROUTE_KEY                  = var.get_specific_apigateway_route_key
+  }
+  api_gateway_execution_arn        = aws_apigatewayv2_api.http_lambda.execution_arn
+  apigateway_id                    = aws_apigatewayv2_api.http_lambda.id
+  apigateway_route_key             = var.get_specific_apigateway_route_key
+  api_gateway_execution_arn_suffix = var.get_specific_api_gateway_execution_arn_suffix
+}
 
 #========================================================================
 // API Gateway section
 #========================================================================
 
-# resource "aws_apigatewayv2_api" "http_lambda" {
-#   name          = var.apigw_name
-#   protocol_type = var.api_protocol_type
-# }
+resource "aws_apigatewayv2_api" "http_lambda" {
+  name          = var.apigw_name
+  protocol_type = var.api_protocol_type
+}
 
-# resource "aws_apigatewayv2_stage" "default" {
-#   api_id = aws_apigatewayv2_api.http_lambda.id
+resource "aws_apigatewayv2_stage" "default" {
+  api_id = aws_apigatewayv2_api.http_lambda.id
 
-#   name        = var.apigateway_stage_name
-#   auto_deploy = true
+  name        = var.apigateway_stage_name
+  auto_deploy = true
 
-#   access_log_settings {
-#     destination_arn = aws_cloudwatch_log_group.api_gw.arn
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.api_gw.arn
 
-#     format = jsonencode({
-#       requestId               = "$context.requestId"
-#       sourceIp                = "$context.identity.sourceIp"
-#       requestTime             = "$context.requestTime"
-#       protocol                = "$context.protocol"
-#       httpMethod              = "$context.httpMethod"
-#       resourcePath            = "$context.resourcePath"
-#       routeKey                = "$context.routeKey"
-#       status                  = "$context.status"
-#       responseLength          = "$context.responseLength"
-#       authorizererror         = "$context.authorizer.error",
-#       errormessage            = "$context.error.message",
-#       errormessageString      = "$context.error.messageString",
-#       errorresponseType       = "$context.error.responseType",
-#       integrationerror        = "$context.integration.error",
-#       integrationErrorMessage = "$context.integrationErrorMessage"
-#       }
-#     )
-#   }
-#   depends_on = [aws_cloudwatch_log_group.api_gw]
-# }
+    format = jsonencode({
+      requestId               = "$context.requestId"
+      sourceIp                = "$context.identity.sourceIp"
+      requestTime             = "$context.requestTime"
+      protocol                = "$context.protocol"
+      httpMethod              = "$context.httpMethod"
+      resourcePath            = "$context.resourcePath"
+      routeKey                = "$context.routeKey"
+      status                  = "$context.status"
+      responseLength          = "$context.responseLength"
+      authorizererror         = "$context.authorizer.error",
+      errormessage            = "$context.error.message",
+      errormessageString      = "$context.error.messageString",
+      errorresponseType       = "$context.error.responseType",
+      integrationerror        = "$context.integration.error",
+      integrationErrorMessage = "$context.integrationErrorMessage"
+      }
+    )
+  }
+  depends_on = [aws_cloudwatch_log_group.api_gw]
+}
 
-# resource "aws_cloudwatch_log_group" "api_gw" {
-#   name = "/aws/api_gw/${var.apigw_name}"
+resource "aws_cloudwatch_log_group" "api_gw" {
+  name = "/aws/api_gw/${var.apigw_name}"
 
-# retention_in_days = var.apigw_log_retention
-# }
+  # retention_in_days = var.apigw_log_retention
+}
 
 # TODO implement alerts for DLQs

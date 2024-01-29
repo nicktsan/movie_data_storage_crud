@@ -21,18 +21,6 @@ variable "mux_webhook_signing_secret" {
   sensitive   = true
 }
 
-# variable "mux_secret_key" {
-#   description = "Key of the mux secret stored in hcp vault secrets"
-#   type        = string
-#   sensitive   = true
-# }
-
-# variable "mux_webhook_signing_secret" {
-#   description = "Key of the mux webhook signing secret stored in hcp vault secrets"
-#   type        = string
-#   sensitive   = true
-# }
-
 variable "region" {
   description = "Region of the app"
   type        = string

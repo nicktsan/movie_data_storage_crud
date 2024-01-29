@@ -12,7 +12,9 @@ let docClient: DynamoDBDocumentClient | null;
 const handler: EventBridgeHandler<any, any, any> = async (event: EventBridgeEvent<any, any>): Promise<void> => {
     //initialize a new Mux instance if there is none.
     mux = await getMux(mux);
+    //initialize a new DynmoDBClient instance if there is none.
     client = await getClient(client);
+    //initialize a new DynamoDBDocumentClient instance if there is none.
     docClient = await getDocClient(client, docClient)
     console.log("EventbridgeEvent:")
     console.log(event)
@@ -27,28 +29,11 @@ const handler: EventBridgeHandler<any, any, any> = async (event: EventBridgeEven
 
         // Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
         const eventdata = JSON.parse(event.detail.data)
-        // const myConstructedEventObject: any = eventVerification.constructedEvent?.data.object
-        // const myConstructedEventObjectId = myConstructedEventObject.id
-
-        // console.log("myConstructedEventObjectId", myConstructedEventObjectId)
-        // const sessionWithLineItems = await mux?.checkout.sessions.retrieve(
-        //     myConstructedEventObjectId,
-        //     {
-        //         expand
-        //             : ['line_items'],
-        //     }
-        // );
-        // const lineItems = sessionWithLineItems.line_items;
-        // console.log("lineItems?.data[0].price", lineItems?.data[0].price)
-        // lineItems?.data.forEach(lineItemdata => {
-        // Fulfill the purchase...
         console.log("eventdata.type: ", eventdata.type)
         if (eventdata.type === "video.asset.ready") {
-            await putMovieData(/*lineItems!.data[0], mux*/eventdata, docClient);
+            //insert movie data if event data type is "video.asset.ready"
+            await putMovieData(eventdata, docClient);
         }
-
-        // });
-
     }
 }
 
