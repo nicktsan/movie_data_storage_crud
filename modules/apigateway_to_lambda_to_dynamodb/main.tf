@@ -18,7 +18,7 @@ resource "aws_lambda_function" "lambda_function" {
 }
 
 resource "aws_apigatewayv2_integration" "apigw_lambda" {
-  api_id = var.apigateway_id //aws_apigatewayv2_api.http_lambda.id
+  api_id = var.apigateway_id
 
   integration_uri        = aws_lambda_function.lambda_function.invoke_arn
   integration_type       = "AWS_PROXY"
@@ -29,7 +29,7 @@ resource "aws_apigatewayv2_integration" "apigw_lambda" {
 }
 
 resource "aws_apigatewayv2_route" "api_route" {
-  api_id = var.apigateway_id //aws_apigatewayv2_api.http_lambda.id
+  api_id = var.apigateway_id
 
   route_key = var.apigateway_route_key
   target    = "integrations/${aws_apigatewayv2_integration.apigw_lambda.id}"
