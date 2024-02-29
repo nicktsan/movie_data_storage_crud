@@ -18,18 +18,6 @@ data "hcp_vault_secrets_secret" "mux_webhook_signing_secret" {
   secret_name = var.mux_webhook_signing_secret
 }
 
-# data to grab the mux secret from hcp vault secrets
-# data "hcp_vault_secrets_secret" "muxSecret" {
-#   app_name    = var.hcp_vault_secrets_app_name
-#   secret_name = var.mux_secret_key
-# }
-
-# # data to grab the mux webhook signing secret from hcp vault secrets
-# data "hcp_vault_secrets_secret" "muxSigningSecret" {
-#   app_name    = var.hcp_vault_secrets_app_name
-#   secret_name = var.mux_webhook_signing_secret
-# }
-
 # Setup for util lambda layer
 data "archive_file" "utils_layer_code_zip" {
   type        = "zip"
